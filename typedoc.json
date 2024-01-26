@@ -1,8 +1,6 @@
 {
-  "entryPoints": ["src/main.ts"],
   "out": "./docs",
-  "theme": "default",
-  "exclude": ["**/*.spec.ts"],
+  "exclude": ["**/*spec.ts"],
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeProtected": true
