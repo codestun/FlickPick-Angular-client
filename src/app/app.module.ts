@@ -25,6 +25,11 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { MovieDetailsDialogComponent } from './movie-details-dialog/movie-details-dialog.component';
 
+/**
+ * The root module of the Angular application.
+ * It imports and declares all necessary Angular components and modules
+ * required for the application to function.
+ */
 @NgModule({
   declarations: [
     AppComponent,

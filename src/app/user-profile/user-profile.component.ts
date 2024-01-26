@@ -3,7 +3,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { Router } from '@angular/router';
 
-// Define the User type
+/**
+ * Type definition for User.
+ */
 type User = {
   _id?: string;
   Name: string;
@@ -13,7 +15,9 @@ type User = {
   FavoriteMovies?: string[];
 };
 
-// Define the Movie type
+/**
+ * Type definition for Movie.
+ */
 type Movie = {
   _id: string;
   Title: string;
@@ -27,42 +31,62 @@ type Movie = {
   ImagePath: string;
 };
 
+/**
+ * Component for managing and displaying the user's profile.
+ */
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit {
+  /**
+  * Current user's data.
+  */
   user: User = { Name: '', Email: '', Password: '', Birthday: new Date(), FavoriteMovies: [] };
+
+  /**
+   * Array of favorite movies for the current user.
+   */
   favoriteMovies: Movie[] = []; // Array of Movie objects
 
+  /**
+   * Constructor for UserProfileComponent.
+   * @param router Router for navigation.
+   * @param snackBar Service for displaying snack bars.
+   * @param fetchApiData Service for fetching API data.
+   */
   constructor(
     public router: Router,
     public snackBar: MatSnackBar,
     public fetchApiData: FetchApiDataService
   ) { }
 
+  /**
+   * Lifecycle hook for initialization. Loads user profile and favorite movies.
+   */
   ngOnInit(): void {
-    // Load user profile and favorite movies on component initiation
     this.loadUserProfile();
     this.loadFavoriteMovies();
   }
 
+  /**
+   * Loads the user's profile data from local storage.
+   */
   loadUserProfile(): void {
-    // Parse user data from local storage
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
     if (userData && userData.Name) {
-      // Set user data if available
       this.user = userData;
     } else {
-      // Redirect to welcome if user data not found
       this.router.navigate(['welcome']);
     }
   }
 
+  /**
+   * Updates the user's profile information.
+   */
   updateUser(): void {
-    // Update user information using the FetchApiDataService
     this.fetchApiData.editUser(this.user.Name, this.user).subscribe({
       next: (updatedUser) => {
         this.snackBar.open('Update successful', 'OK', { duration: 2000 });
@@ -76,12 +100,16 @@ export class UserProfileComponent implements OnInit {
     });
   }
 
+  /**
+   * Submits the user's updated information.
+   */
   handleSubmit(): void {
-    // Call updateUser method when form is submitted
     this.updateUser();
   }
 
-  // Load favorite movies for the user
+  /**
+     * Loads the user's favorite movies.
+     */
   loadFavoriteMovies(): void {
     this.fetchApiData.getAllMovies().subscribe((movies: Movie[]) => {
       this.favoriteMovies = movies.filter(movie =>
@@ -89,48 +117,55 @@ export class UserProfileComponent implements OnInit {
     });
   }
 
-  // Check if a movie is in the user's favorites
+  /**
+     * Checks if a movie is in the user's list of favorites.
+     * @param movie The movie to check.
+     * @returns True if the movie is a favorite, otherwise false.
+     */
   isFavorite(movie: Movie): boolean {
     return this.user.FavoriteMovies?.includes(movie._id) ?? false;
   }
 
-  // Toggle the favorite status of a movie
+  /**
+   * Toggles the favorite status of a movie.
+   * @param movie The movie to toggle.
+   */
   toggleFavorite(movie: Movie): void {
     if (this.isFavorite(movie)) {
-      // Remove from favorites
       this.removeFavoriteMovie(movie._id);
     } else {
-      // Add to favorites (implementation needed)
       this.addFavoriteMovie(movie._id);
     }
   }
 
-  // Remove a movie from the user's favorite list
+  /**
+   * Removes a movie from the user's list of favorites.
+   * @param movieId The ID of the movie to remove.
+   */
   removeFavoriteMovie(movieId: string): void {
-    // Assuming you have the user's username
     const username = this.user.Name;
 
     this.fetchApiData.deleteFavoriteMovie(username, movieId).subscribe({
       next: (response: any) => {
-        // Update your component's state to reflect the removal
         this.favoriteMovies = this.favoriteMovies.filter(movie => movie._id !== movieId);
         console.log('Movie removed from favorites:', response);
       },
       error: (error: any) => {
-        // Handle any errors here
         console.error('Error removing movie from favorites:', error);
       }
     });
   }
 
-  // Add a movie to the user's favorite list
+  /**
+     * Adds a movie to the user's list of favorites.
+     * @param movieId The ID of the movie to add.
+     */
   addFavoriteMovie(movieId: string): void {
     const userName = this.user.Name;
 
     this.fetchApiData.addFavoriteMovie(userName, movieId).subscribe({
       next: (response: any) => {
-        // Update the local favoriteMovies array to include the new favorite
-        this.favoriteMovies.push(response);
+        this.favoriteMovies.push(response); // Update the local favoriteMovies array to include the new favorite
         console.log('Movie added to favorites:', response);
       },
       error: (error: any) => {
